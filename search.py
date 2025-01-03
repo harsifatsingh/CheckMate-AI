@@ -1,3 +1,4 @@
+import random
 from evaluator import Evaluator
 
 class Search:
@@ -9,18 +10,9 @@ class Search:
 
     def find_best_move(self, board, color, depth):
         """
-        Implement a search algorithm (e.g., Minimax with Alpha-Beta) to find the best move.
-        - board: current Board object
-        - color: "WHITE" or "BLACK" to move
-        - depth: maximum search depth
-        Return the best move found within the given depth limit.
+        In this basic example, we'll just pick a random legal move for the AI.
         """
-        pass
-
-    def _minimax(self, board, color, depth, alpha, beta):
-        """
-        A recursive minimax (or alpha-beta) helper method.
-        Returns the best score for the current player.
-        Optionally returns the best move as well.
-        """
-        pass
+        moves = board.generate_legal_moves(color)
+        if not moves:
+            return None
+        return random.choice(moves)
