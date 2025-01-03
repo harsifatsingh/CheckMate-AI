@@ -102,10 +102,15 @@ class Board:
         self.squares[row][col] = piece
 
     def is_legal_move(self, move, color):
+        """
+        Optional: If you want a function to check a single move’s legality:
+        """
+        # Make the move on the board
         self.make_move(move)
-        legal = not self.is_in_check(color)
+        # If my own king is in check, it's not legal
+        still_legal = not self.is_in_check(color)
         self.undo_move()
-        return legal
+        return still_legal
 
     def make_move(self, move):
         """
@@ -247,46 +252,36 @@ class Board:
                 self.squares[start_row][start_col] = Pawn(piece_now.color)
 
     def generate_legal_moves(self, color):
-        """
-        Generate all pseudo-legal moves for the given color 
-        (NOT checking for check or checkmate for this example).
-        """
+        legal_moves = []
+        pseudo_moves = self.generate_pseudo_legal_moves(color)
+        for move in pseudo_moves:
+            self.make_move(move)
+            if not self.is_in_check(color):
+                legal_moves.append(move)
+            self.undo_move()
+        return legal_moves
+
+    def is_in_check(self, color):
+        king_row, king_col = self.find_king(color)
+        if king_row is None:
+            return False
+
+        enemy_color = "BLACK" if color == "WHITE" else "WHITE"
+        # Only pseudo-legal moves needed here
+        enemy_moves = self.generate_pseudo_legal_moves(enemy_color)
+        for m in enemy_moves:
+            if (m.end_row, m.end_col) == (king_row, king_col):
+                return True
+        return False
+    
+    def generate_pseudo_legal_moves(self, color):
         moves = []
         for row in range(8):
             for col in range(8):
                 piece = self.squares[row][col]
                 if piece and piece.color == color:
-                    piece_moves = piece.get_legal_moves(self, row, col)
-                    moves.extend(piece_moves)
-
-        # Filter out moves that leave own king in check
-        legal_moves = []
-        for move in moves:
-            if self.is_legal_move(move, color):
-                legal_moves.append(move)
-        return legal_moves
-
-    def is_in_check(self, color):
-        king_pos = None
-        for row in range(8):
-            for col in range(8):
-                piece = self.squares[row][col]
-                if piece and piece.color == color and piece.symbol().upper() == 'K':
-                    king_pos = (row, col)
-                    break
-            if king_pos:
-                break
-
-        if not king_pos:
-            return False
-        king_row, king_col = king_pos
-
-        enemy_color = "WHITE" if color == "BLACK" else "BLACK"
-        all_enemy_moves = self.generate_legal_moves(enemy_color)
-        for m in all_enemy_moves:
-            if m.end_row == king_row and m.end_col == king_col:
-                return True
-        return False
+                    moves.extend(piece.get_legal_moves(self, row, col))
+        return moves
     
     def is_checkmate(self, color):
         """

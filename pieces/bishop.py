@@ -31,4 +31,4 @@ class Bishop(Piece):
         return moves
     
     def __str__(self):
-        return "B" if self.color == "white" else "b"
+        return "B" if self.color == "WHITE" else "b"

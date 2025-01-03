@@ -31,4 +31,4 @@ class Rook(Piece):
         return moves  
     
     def __str___(self):
-        return "R" if self.color == "white" else "r"
+        return "R" if self.color == "WHITE" else "r"

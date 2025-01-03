@@ -33,4 +33,4 @@ class Knight(Piece):
         return moves
     
     def __str__(self):
-        return "N" if self.color == "white" else "n"
+        return "N" if self.color == "WHITE" else "n"
