@@ -33,39 +33,49 @@ class Board:
         return [[None for _ in range(8)] for _ in range(8)]
 
     def setup_initial_position(self):
-        """
-        Place all pieces in their initial positions.
-        """
-        # Pawns
+        # Clear board
+        self.squares = [[None]*8 for _ in range(8)]
+
+        # White pawns on row=6
         for col in range(8):
-            self.squares[1][col] = Pawn("WHITE")
-            self.squares[6][col] = Pawn("BLACK")
+            self.squares[6][col] = Pawn("WHITE")
 
-        # Rooks
-        self.squares[0][0] = Rook("WHITE")
-        self.squares[0][7] = Rook("WHITE")
-        self.squares[7][0] = Rook("BLACK")
-        self.squares[7][7] = Rook("BLACK")
+        # Black pawns on row=1
+        for col in range(8):
+            self.squares[1][col] = Pawn("BLACK")
 
-        # Knights
-        self.squares[0][1] = Knight("WHITE")
-        self.squares[0][6] = Knight("WHITE")
-        self.squares[7][1] = Knight("BLACK")
-        self.squares[7][6] = Knight("BLACK")
+        # White rooks on row=7
+        self.squares[7][0] = Rook("WHITE")
+        self.squares[7][7] = Rook("WHITE")
 
-        # Bishops
-        self.squares[0][2] = Bishop("WHITE")
-        self.squares[0][5] = Bishop("WHITE")
-        self.squares[7][2] = Bishop("BLACK")
-        self.squares[7][5] = Bishop("BLACK")
+        # Black rooks on row=0
+        self.squares[0][0] = Rook("BLACK")
+        self.squares[0][7] = Rook("BLACK")
 
-        # Queens
-        self.squares[0][3] = Queen("WHITE")
-        self.squares[7][3] = Queen("BLACK")
+        # White knights on row=7
+        self.squares[7][1] = Knight("WHITE")
+        self.squares[7][6] = Knight("WHITE")
+        # Black knights on row=0
+        self.squares[0][1] = Knight("BLACK")
+        self.squares[0][6] = Knight("BLACK")
 
-        # Kings
-        self.squares[0][4] = King("WHITE")
-        self.squares[7][4] = King("BLACK")
+        # White bishops on row=7
+        self.squares[7][2] = Bishop("WHITE")
+        self.squares[7][5] = Bishop("WHITE")
+        # Black bishops on row=0
+        self.squares[0][2] = Bishop("BLACK")
+        self.squares[0][5] = Bishop("BLACK")
+
+        # White queen on row=7, col=3
+        self.squares[7][3] = Queen("WHITE")
+        # Black queen on row=0, col=3
+        self.squares[0][3] = Queen("BLACK")
+
+        # White king on row=7, col=4
+        self.squares[7][4] = King("WHITE")
+        # Black king on row=0, col=4
+        self.squares[0][4] = King("BLACK")
+
 
     def parse_move_string(self, move_str, color):
         """
@@ -76,10 +86,10 @@ class Board:
             return None
 
         # Convert algebraic notation: 'a' -> col=0, 'b'->1... 'h'->7
-        start_col = ord(move_str[0]) - ord('a')
-        start_row = 8 - int(move_str[1])  # '1' -> row=7, '2'->6, etc.
-        end_col = ord(move_str[2]) - ord('a')
-        end_row = 8 - int(move_str[3])
+        start_col = ord(move_str[0]) - ord('a')       # 'e' -> 4
+        start_row = 8 - int(move_str[1])              # '2' -> 6
+        end_col   = ord(move_str[2]) - ord('a')
+        end_row   = 8 - int(move_str[3]) 
 
         # Basic validation
         if not (0 <= start_row < 8 and 0 <= start_col < 8):
@@ -264,10 +274,12 @@ class Board:
     def is_in_check(self, color):
         king_row, king_col = self.find_king(color)
         if king_row is None:
+            # Means we couldn't find the king (shouldn’t happen in normal play, but just in case)
             return False
 
+        # Then do your logic to see if the enemy can capture king_row, king_col
         enemy_color = "BLACK" if color == "WHITE" else "WHITE"
-        # Only pseudo-legal moves needed here
+        # (Pseudo-legal moves recommended, to avoid infinite recursion)
         enemy_moves = self.generate_pseudo_legal_moves(enemy_color)
         for m in enemy_moves:
             if (m.end_row, m.end_col) == (king_row, king_col):
@@ -300,17 +312,33 @@ class Board:
         moves = self.generate_legal_moves(color)
         return len(moves) == 0
 
+    def find_king(self, color):
+        """
+        Return (row, col) of the king of the given color.
+        If not found, return (None, None).
+        """
+        for row in range(8):
+            for col in range(8):
+                piece = self.squares[row][col]
+                if piece and piece.color == color:
+                    # Option A: check str(piece) == 'K' or 'k'
+                    if str(piece).upper() == 'K':
+                        return row, col
+                    # Option B: check with isinstance(piece, King)
+                    # if isinstance(piece, King):
+                    #     return row, col
+        return None, None
+
     def __str__(self):
-        """
-        Return a string representation of the board.
-        Top row is row=0 in our matrix, but visually it's rank 8 in chess.
-        """
         board_str = ""
         for row in range(8):
-            rank_str = f"{8 - row} "
+            # row=0 is top => that's rank=8
+            rank_num = 8 - row
+            rank_str = f"{rank_num} "
             for col in range(8):
                 piece = self.squares[row][col]
                 rank_str += f"{str(piece) if piece else '.'} "
             board_str += rank_str + "\n"
         board_str += "  a b c d e f g h\n"
         return board_str
+
