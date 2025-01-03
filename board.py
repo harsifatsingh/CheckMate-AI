@@ -262,6 +262,11 @@ class Board:
                 self.squares[start_row][start_col] = Pawn(piece_now.color)
 
     def generate_legal_moves(self, color):
+        """
+        Filter out moves that leave your own king in check.
+        This uses the 'make_move -> is_in_check -> undo_move' approach
+        to detect pins, etc.
+        """
         legal_moves = []
         pseudo_moves = self.generate_pseudo_legal_moves(color)
         for move in pseudo_moves:
@@ -272,14 +277,17 @@ class Board:
         return legal_moves
 
     def is_in_check(self, color):
+        """
+        Return True if 'color' king can be captured by an enemy piece right now.
+        1) find the king position
+        2) generate pseudo-legal moves of the enemy
+        3) if any end-square is king's square => check
+        """
         king_row, king_col = self.find_king(color)
         if king_row is None:
-            # Means we couldn't find the king (shouldn’t happen in normal play, but just in case)
+            # No king found (unlikely in normal play)
             return False
-
-        # Then do your logic to see if the enemy can capture king_row, king_col
         enemy_color = "BLACK" if color == "WHITE" else "WHITE"
-        # (Pseudo-legal moves recommended, to avoid infinite recursion)
         enemy_moves = self.generate_pseudo_legal_moves(enemy_color)
         for m in enemy_moves:
             if (m.end_row, m.end_col) == (king_row, king_col):
@@ -287,20 +295,20 @@ class Board:
         return False
     
     def generate_pseudo_legal_moves(self, color):
+        """
+        Collect all moves based on piece movement rules,
+        ignoring whether the king is left in check.
+        """
         moves = []
         for row in range(8):
             for col in range(8):
                 piece = self.squares[row][col]
                 if piece and piece.color == color:
-                    moves.extend(piece.get_legal_moves(self, row, col))
+                    piece_moves = piece.get_legal_moves(self, row, col)
+                    moves.extend(piece_moves)
         return moves
     
     def is_checkmate(self, color):
-        """
-        Check if the given color is in checkmate: 
-        - King is in check
-        - No legal moves
-        """
         if not self.is_in_check(color):
             return False
         moves = self.generate_legal_moves(color)
@@ -314,20 +322,16 @@ class Board:
 
     def find_king(self, color):
         """
-        Return (row, col) of the king of the given color.
-        If not found, return (None, None).
+        Return (row,col) of the king of 'color', or (None,None) if not found.
         """
-        for row in range(8):
-            for col in range(8):
-                piece = self.squares[row][col]
+        for r in range(8):
+            for c in range(8):
+                piece = self.squares[r][c]
                 if piece and piece.color == color:
-                    # Option A: check str(piece) == 'K' or 'k'
-                    if str(piece).upper() == 'K':
-                        return row, col
-                    # Option B: check with isinstance(piece, King)
-                    # if isinstance(piece, King):
-                    #     return row, col
-        return None, None
+                    # If str(piece).upper() == 'K' or isinstance(piece, King)
+                    if isinstance(piece, King):
+                        return (r,c)
+        return (None, None)
 
     def __str__(self):
         board_str = ""
