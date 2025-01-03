@@ -1,4 +1,7 @@
 from .piece import Piece
+from move import Move
+from .rook import Rook
+from .bishop import Bishop
 
 class Queen(Piece):
     def __init__(self, color):
@@ -7,6 +10,12 @@ class Queen(Piece):
     def get_legal_moves(self, board, row, col):
         """
         Return a list of possible moves for a queen.
-        Combines rook-like and bishop-like movements.
+        moves = Rook.get_legal_moves(self, board, row, col)
+        moves.extend(Bishop.get_legal_moves(self, board, row, col))
         """
-        pass
+        moves = Rook.get_legal_moves(board, row, col)
+        moves.extend(Bishop.get_legal_moves(board, row, col))
+        return moves
+    
+    def __str__(self):
+        return "Q" if self.color == "white" else "q"
