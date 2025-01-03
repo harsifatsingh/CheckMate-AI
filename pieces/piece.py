@@ -15,3 +15,10 @@ class Piece:
         Children should override with appropriate letter.
         """
         return '?'
+
+    def symbol(self):
+        """
+        By default, the symbol is str(self), e.g. 'p' or 'Q'.
+        But we keep a separate method if we need direct logic in Board.
+        """
+        return str(self)

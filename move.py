@@ -1,5 +1,5 @@
 class Move:
-    def __init__(self, start_row, start_col, end_row, end_col, piece_moved, piece_captured=None):
+    def __init__(self, start_row, start_col, end_row, end_col, piece_moved, piece_captured=None, promotion=None):
         """
         A basic Move object.
         """
@@ -9,6 +9,7 @@ class Move:
         self.end_col = end_col
         self.piece_moved = piece_moved
         self.piece_captured = piece_captured
+        self.promotion = promotion
 
     def __eq__(self, other):
         if not isinstance(other, Move):
@@ -18,7 +19,8 @@ class Move:
                 self.end_row == other.end_row and
                 self.end_col == other.end_col and
                 self.piece_moved == other.piece_moved and
-                self.piece_captured == other.piece_captured)
+                self.piece_captured == other.piece_captured and
+                self.promotion == other.promotion)
 
     def __str__(self):
         """
@@ -28,5 +30,6 @@ class Move:
         start_rank = str(8 - self.start_row)
         end_file = chr(ord('a') + self.end_col)
         end_rank = str(8 - self.end_row)
+        promo_str = f"{self.promotion}" if self.promotion else ""
 
-        return f"{start_file}{start_rank}{end_file}{end_rank}"
+        return f"{start_file}{start_rank}{end_file}{end_rank}{promo_str}"
