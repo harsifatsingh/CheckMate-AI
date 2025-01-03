@@ -14,6 +14,18 @@ class Board:
         """
         self.squares = self._create_empty_board()
 
+        self.white_can_castle_kingside = True
+        self.white_can_castle_queenside = True
+        self.black_can_castle_kingside = True
+        self.black_can_castle_queenside = True
+
+        # Track which square is available for en passant capture, e.g. (3,4)
+        # or None if no en passant is possible
+        self.en_passant_target = None
+
+        # Move history for undo
+        self.move_history = []
+
     def _create_empty_board(self):
         """
         Helper to create an 8x8 grid of None.
@@ -89,14 +101,150 @@ class Board:
     def set_piece_at(self, row, col, piece):
         self.squares[row][col] = piece
 
+    def is_legal_move(self, move, color):
+        self.make_move(move)
+        legal = not self.is_in_check(color)
+        self.undo_move()
+        return legal
+
     def make_move(self, move):
         """
         Update the board for the given move:
         - Move the piece on start -> end.
         - Replace (capture) or set None on start.
         """
-        self.squares[move.end_row][move.end_col] = move.piece_moved
+        start_piece = move.piece_moved
+        self.move_history.append((move, self.white_can_castle_kingside, self.white_can_castle_queenside,
+                                  self.black_can_castle_kingside, self.black_can_castle_queenside,
+                                  self.en_passant_target))
+        
+        self.squares[move.end_row][move.end_col] = start_piece
         self.squares[move.start_row][move.start_col] = None
+
+        self.handle_special_moves(move)
+
+    def handle_special_moves(self, move):
+        piece = move.piece_moved
+        start_row, start_col = move.start_row, move.start_col
+        end_row, end_col = move.end_row, move.end_col
+
+        self.en_passant_target = None
+
+        # Pawn-specific logic
+        if isinstance(piece, Pawn):
+            # En passant capture
+            # If we moved diagonally to an empty square that was the en_passant_target
+            if (start_col != end_col and move.piece_captured is None):
+                # So the captured pawn must be behind end_row
+                captured_row = start_row  # The pawn is on the row we started from
+                self.squares[captured_row][end_col] = None
+
+            # If the pawn moved two squares, set en_passant_target
+            if abs(end_row - start_row) == 2:
+                # This is the row *between* start_row & end_row
+                row_direction = 1 if piece.color == "BLACK" else -1
+                self.en_passant_target = (end_row + row_direction, end_col)
+
+            # Promotion
+            if (end_row == 0 and piece.color == "WHITE") or (end_row == 7 and piece.color == "BLACK"):
+                if move.promotion:
+                    promo_char = move.promotion.upper()  # 'Q', 'R', 'N', 'B'
+                    if promo_char == 'Q':
+                        self.squares[end_row][end_col] = Queen(piece.color)
+                    elif promo_char == 'R':
+                        self.squares[end_row][end_col] = Rook(piece.color)
+                    elif promo_char == 'N':
+                        self.squares[end_row][end_col] = Knight(piece.color)
+                    elif promo_char == 'B':
+                        self.squares[end_row][end_col] = Bishop(piece.color)
+                else:
+                    # Default to queen if none specified
+                    self.squares[end_row][end_col] = Queen(piece.color)
+
+        # Castling            
+        if isinstance(piece, King):
+            # If king moves two squares horizontally, it's castling
+            if abs(end_col - start_col) == 2:
+                # King side or queen side?
+                if end_col == 6:  # King-side (short) castling
+                    # Move the rook from col 7 to col 5
+                    rook = self.squares[end_row][7]
+                    self.squares[end_row][5] = rook
+                    self.squares[end_row][7] = None
+                else:  # end_col == 2 => Queen-side
+                    rook = self.squares[end_row][0]
+                    self.squares[end_row][3] = rook
+                    self.squares[end_row][0] = None
+
+        # If we move a king or rook, update castling rights
+        if isinstance(piece, King):
+            if piece.color == "WHITE":
+                self.white_can_castle_kingside = False
+                self.white_can_castle_queenside = False
+            else:
+                self.black_can_castle_kingside = False
+                self.black_can_castle_queenside = False
+
+        if isinstance(piece, Rook):
+            if piece.color == "WHITE":
+                if start_row == 7 and start_col == 7:
+                    self.white_can_castle_kingside = False
+                if start_row == 7 and start_col == 0:
+                    self.white_can_castle_queenside = False
+            else:
+                if start_row == 0 and start_col == 7:
+                    self.black_can_castle_kingside = False
+                if start_row == 0 and start_col == 0:
+                    self.black_can_castle_queenside = False
+
+    def undo_move(self):
+        if not self.move_history:
+            return
+        (move,
+         w_cks, w_cqs,
+         b_cks, b_cqs,
+         enp) = self.move_history.pop()
+        self.white_can_castle_kingside = w_cks
+        self.white_can_castle_queenside = w_cqs
+        self.black_can_castle_kingside = b_cks
+        self.black_can_castle_queenside = b_cqs
+        self.en_passant_target = enp
+
+        start_row, start_col = move.start_row, move.start_col
+        end_row, end_col = move.end_row, move.end_col
+        self.squares[start_row][start_col] = move.piece_moved
+        self.squares[end_row][end_col] = move.piece_captured
+
+        # Special handling for undoing castling
+        if isinstance(move.piece_moved, King) and abs(end_col - start_col) == 2:
+            # Moved two squares => castling
+            if end_col == 6:
+                # Rook from col 5 back to col 7
+                rook = self.squares[end_row][5]
+                self.squares[end_row][7] = rook
+                self.squares[end_row][5] = None
+            else:
+                # Rook from col 3 back to col 0
+                rook = self.squares[end_row][3]
+                self.squares[end_row][0] = rook
+                self.squares[end_row][3] = None
+
+        # Special undo for en passant
+        # If we captured a pawn en passant, the captured piece would be at move.start_row, end_col
+        if isinstance(move.piece_moved, Pawn):
+            if move.piece_captured is None and (move.start_col != move.end_col):
+                # So we must restore the captured pawn
+                row_direction = 1 if move.piece_moved.color == "WHITE" else -1
+                self.squares[move.end_row][move.end_col] = None
+                self.squares[move.start_row][move.end_col] = Pawn("WHITE" if move.piece_moved.color == "BLACK" else "BLACK")
+
+        # Special undo for promotion
+        if isinstance(move.piece_moved, Pawn):
+            # If end square is a Queen/Bishop/Rook/Knight of same color, revert to a pawn
+            piece_now = self.squares[start_row][start_col]
+            if not isinstance(piece_now, Pawn):
+                # Revert to a Pawn
+                self.squares[start_row][start_col] = Pawn(piece_now.color)
 
     def generate_legal_moves(self, color):
         """
@@ -110,7 +258,52 @@ class Board:
                 if piece and piece.color == color:
                     piece_moves = piece.get_legal_moves(self, row, col)
                     moves.extend(piece_moves)
-        return moves
+
+        # Filter out moves that leave own king in check
+        legal_moves = []
+        for move in moves:
+            if self.is_legal_move(move, color):
+                legal_moves.append(move)
+        return legal_moves
+
+    def is_in_check(self, color):
+        king_pos = None
+        for row in range(8):
+            for col in range(8):
+                piece = self.squares[row][col]
+                if piece and piece.color == color and piece.symbol().upper() == 'K':
+                    king_pos = (row, col)
+                    break
+            if king_pos:
+                break
+
+        if not king_pos:
+            return False
+        king_row, king_col = king_pos
+
+        enemy_color = "WHITE" if color == "BLACK" else "BLACK"
+        all_enemy_moves = self.generate_legal_moves(enemy_color)
+        for m in all_enemy_moves:
+            if m.end_row == king_row and m.end_col == king_col:
+                return True
+        return False
+    
+    def is_checkmate(self, color):
+        """
+        Check if the given color is in checkmate: 
+        - King is in check
+        - No legal moves
+        """
+        if not self.is_in_check(color):
+            return False
+        moves = self.generate_legal_moves(color)
+        return len(moves) == 0
+
+    def is_stalemate(self, color):
+        if self.is_in_check(color):
+            return False
+        moves = self.generate_legal_moves(color)
+        return len(moves) == 0
 
     def __str__(self):
         """
