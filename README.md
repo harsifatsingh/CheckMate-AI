@@ -106,8 +106,6 @@ Displays an ASCII board in the terminal.
 White enters moves in standard algebraic notation (e.g., `e2e4`), then the AI plays automatically.
 
 #### Sample CLI Session
-<details>
-<!-- <summary>Click to expand</summary> -->
 
 ```bash
 > python main.py --cli
@@ -148,7 +146,6 @@ AI played: b8c6
 
 WHITE's move (e.g. 'e2e4' or 'quit'):
 ```
-</details>
 
 Type `quit` at any time to end the game.
 
