@@ -6,7 +6,7 @@ This Python-based Chess Engine supports both command-line and graphical (Pygame)
 - **Two-human mode** (in CLI or GUI)
 - Drag-and-drop piece movement in the GUI, including move highlighting.
 
-The AI is powered by a Minimax search with Alpha-Beta pruning (or a simpler algorithm if you prefer). All standard chess rules, including check/checkmate detection, are implemented. Special rules like castling, en passant, and promotions are also supported (depending on your final implementation).
+The AI is powered by a Minimax search with Alpha-Beta pruning. All standard chess rules, including check/checkmate detection, are implemented. Special rules like castling, en passant, and promotions are also supported.
 
 ## Features
 
@@ -42,7 +42,7 @@ pip install pygame
 1. Clone or download this repository.
 2. Ensure your terminal/command prompt is in the project directory.
 
-## Directory Structure (Example)
+## Directory Structure
 
 ```plaintext
 chess_engine/
@@ -119,12 +119,6 @@ python main.py --cli --2p
 - Legal moves highlight.
 - Release on a valid square to finalize the move.
 
-## Known Limitations
-
-- No advanced repetition or 50-move rule detection by default (unless you added it).
-- No time control (clocks) are included in this basic version.
-- If you encounter any illegal AI moves, ensure you’re calling `generate_legal_moves` rather than `generate_pseudo_legal_moves`.
-
 ## Contributing
 
 1. Fork the repository and clone locally.
@@ -140,21 +134,8 @@ We welcome improvements such as:
 
 ## License
 
-Include your preferred license (e.g., MIT, GPLv3) here. For example:
+This project is open-source under the [MIT License](LICENSE), which allows commercial and private use, modification, and distribution.
 
-```
-MIT License
+### Happy Coding!
 
-Copyright (c) 20XX ...
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files...
-```
-
-## Acknowledgments
-
-- Pygame for providing the Python game framework.
-- Inspiration from popular chess engines and chess.com’s interface.
-- Additional resources from the Python and chess programming communities.
-
-Happy Coding & Enjoy Your Chess!
+If you find any issues or have improvements, feel free to submit a pull request or open an issue. Thank you for checking out **Chess-engine**!
