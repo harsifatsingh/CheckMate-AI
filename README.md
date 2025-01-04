@@ -107,7 +107,7 @@ White enters moves in standard algebraic notation (e.g., `e2e4`), then the AI pl
 
 #### Sample CLI Session
 <details>
-<summary>Click to expand</summary>
+<!-- <summary>Click to expand</summary> -->
 
 ```bash
 > python main.py --cli
