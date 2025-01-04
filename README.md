@@ -1,58 +1,59 @@
 # Chess Engine
 
-This Python-based Chess Engine supports both command-line and graphical (Pygame) interfaces. You can play:
+A **Python-based Chess Engine** offering both **command-line** and **graphical (Pygame)** interfaces. You can **drag and drop** pieces in the GUI, or take turns typing moves in the CLI. Supports **Human vs AI** (Minimax + Alpha-Beta) or **Two-human** mode. All standard chess rules are included—check, checkmate, castling, en passant, and promotions.
 
-- **Human vs. AI** (in CLI or GUI)
-- **Two-human mode** (in CLI or GUI)
-- Drag-and-drop piece movement in the GUI, including move highlighting.
-
-The AI is powered by a Minimax search with Alpha-Beta pruning. All standard chess rules, including check/checkmate detection, are implemented. Special rules like castling, en passant, and promotions are also supported.
+---
 
 ## Features
 
 ### Multiple Modes
-- **CLI**: Command-line interface with text-based board display.
-- **GUI**: Pygame-based board with drag-and-drop pieces, similar to chess.com style.
-- Human vs. AI or Two humans (both in CLI or GUI mode).
+- **CLI**: Command-line interface with text-based board display.  
+- **GUI**: Pygame-based board, similar to chess.com’s drag-and-drop style.  
+- **Human vs. AI** or **Two Humans** (in both CLI or GUI).
 
 ### Minimax AI (Alpha-Beta)
-- Evaluates positions with a material-based heuristic.
-- Configurable search depth.
+- Material-based **Evaluator**.  
+- Configurable search depth.  
+- Can be extended with advanced heuristics (move ordering, transposition tables, etc.).
 
 ### Legal Move Generation
-- Distinguishes pseudo-legal from fully legal moves (no illegal captures, no pinned-piece moves).
-- Automatic check/checkmate/stalemate detection.
+- Separates pseudo-legal from fully legal moves, ensuring no pinned-piece or illegal captures.  
+- Automatic **check/checkmate/stalemate** detection.
 
 ### Move Highlighting (GUI)
-- Highlights squares to which a dragged piece can move.
-- Prevents dropping a piece on illegal squares.
+- Shows squares a dragged piece can move to.  
+- Rejects drops on illegal squares.
 
 ### Piece Images
-- Choose your own set of PNG images (e.g., `wP.png`, `bQ.png`) in the `assets/` folder for the GUI.
+- Store your **PNG** piece images in `assets/` (e.g., `wP.png`, `bQ.png`).  
+- Easily replace them with your own artwork or alternate piece sets.
+
+---
 
 ## Installation & Requirements
 
-- **Python 3.7+** (or any recent version of Python 3).
-- **Pygame** (for GUI mode). Install via:
+- **Python 3.7+** (or newer).
+- **Pygame** (for GUI mode). Install it via:
+  ```bash
+  pip install pygame
+  ```
 
+Clone or download this repository and navigate into its folder:
 ```bash
-pip install pygame
+git clone https://github.com/your-username/chess_engine.git
+cd chess_engine
 ```
 
-1. Clone or download this repository.
-2. Ensure your terminal/command prompt is in the project directory.
-
-## Directory Structure
-
-```plaintext
+### Directory Structure
+```
 chess_engine/
-├── main.py
-├── game_manager.py
-├── gui.py
-├── board.py
-├── search.py
-├── move.py
-├── evaluator.py
+├── main.py            # Entry point for CLI or GUI
+├── game_manager.py    # Handles game flow, turns, AI calls
+├── gui.py             # Pygame interface (drag-and-drop, highlighting)
+├── board.py           # Board logic, piece placement, move legality checks
+├── search.py          # AI search (Minimax, Alpha-Beta)
+├── move.py            # Move class (start, end, piece, capture, etc.)
+├── evaluator.py       # Evaluate board states (material, etc.)
 ├── pieces/
 │   ├── __init__.py
 │   ├── piece.py
@@ -63,79 +64,133 @@ chess_engine/
 │   ├── queen.py
 │   └── king.py
 ├── assets/
-│   ├── wP.png
-│   ├── wR.png
-│   ├── ...
-│   ├── bP.png
-│   ├── bR.png
+│   ├── wP.png         # White Pawn image
+│   ├── wR.png         # White Rook image
+│   ├── ... etc. ...
+│   ├── bP.png         # Black Pawn image
+│   ├── bR.png         # Black Rook image
 │   └── ...
-└── README.md
+└── README.md          # This file
 ```
 
-- `assets/`: Place your piece images here (e.g., `wP.png` for White Pawn, `bK.png` for Black King, etc.).
-- `pieces/`: All piece-specific classes.
-- `board.py`: Contains the Board class (setup, move application, legality checking).
-- `game_manager.py`: The main driver for game flow (turns, inputs, calls AI).
-- `gui.py`: The Pygame-based interface for drag-and-drop.
-- `search.py`: AI logic (Minimax + Alpha-Beta).
-- `main.py`: Entry point for launching the game (CLI or GUI).
+- **assets/**: Contains your piece images (one for each piece/color).
+- **pieces/**: Specialized classes for each chess piece type.
+- **board.py**: The heart of the engine, sets up the board and enforces rules.
+- **game_manager.py**: Orchestrates game turns, interacts with players or AI.
+- **gui.py**: Implements the Pygame-based drag-and-drop interface.
+- **search.py**: Contains AI logic (Minimax with alpha-beta pruning).
+
+---
 
 ## Usage
 
-After installing dependencies, open a terminal in the `chess_engine/` directory.
+Open a terminal in the `chess_engine/` directory after installing dependencies.
 
-### GUI Mode
-
+### 1. GUI Mode
 ```bash
 python main.py
 ```
+Launches a Pygame window with drag-and-drop movement.  
+By default, White is a human player and Black is the AI (or whichever configuration you set).
 
-- Launches a Pygame window with a drag-and-drop interface.
-- By default, it’s set to Human (White) vs. AI (Black) or whichever mode you configured.
+**How to play (GUI):**
+- Click and hold on a piece to drag it; legal moves highlight.
+- Release over a valid square to finalize the move.
+- Close the window or press `Ctrl+C` in terminal to exit.
 
-### CLI Mode (Human vs. AI)
-
+### 2. CLI Mode (Human vs. AI)
 ```bash
 python main.py --cli
 ```
+Displays an ASCII board in the terminal.  
+White enters moves in standard algebraic notation (e.g., `e2e4`), then the AI plays automatically.
 
-- Displays an ASCII board in your terminal.
-- White types moves like `e2e4`, and Black is controlled by the AI.
+#### Sample CLI Session
+<details>
+<summary>Click to expand</summary>
 
-### CLI Mode (Two Humans)
+```bash
+> python main.py --cli
+  8  r n b q k b n r
+  7  p p p p p p p p
+  6  . . . . . . . .
+  5  . . . . . . . .
+  4  . . . . . . . .
+  3  . . . . . . . .
+  2  P P P P P P P P
+  1  R N B Q K B N R
+     a b c d e f g h
 
+WHITE's move (e.g. 'e2e4' or 'quit'): e2e4
+
+  8  r n b q k b n r
+  7  p p p p p p p p
+  6  . . . . . . . .
+  5  . . . . . . . .
+  4  . . . . P . . .
+  3  . . . . . . . .
+  2  P P P P . P P P
+  1  R N B Q K B N R
+     a b c d e f g h
+
+BLACK (AI) is thinking...
+AI played: b8c6
+
+  8  r . b q k b n r
+  7  p p p p p p p p
+  6  . . n . . . . .
+  5  . . . . . . . .
+  4  . . . . P . . .
+  3  . . . . . . . .
+  2  P P P P . P P P
+  1  R N B Q K B N R
+     a b c d e f g h
+
+WHITE's move (e.g. 'e2e4' or 'quit'):
+```
+</details>
+
+Type `quit` at any time to end the game.
+
+### 3. CLI Mode (Two Humans)
 ```bash
 python main.py --cli --2p
 ```
+Disables the AI, letting two local players both enter moves.  
+Useful for testing or playing a friend via a terminal.
 
-- Both players type moves. No AI involved.
-
-### Move Notation
-- Type moves in algebraic format, e.g., `e2e4`.
-- Type `quit` to end the game.
-
-### Drag-and-drop (GUI mode)
-- Click and hold on a piece to drag it.
-- Legal moves highlight.
-- Release on a valid square to finalize the move.
+---
 
 ## Contributing
 
-1. Fork the repository and clone locally.
-2. Create a new branch for your feature or fix.
-3. Commit and push your work.
-4. Open a Pull Request describing your changes.
+We welcome contributions for bug fixes, AI enhancements, or new features.
 
-We welcome improvements such as:
-- Better evaluation heuristics.
-- Enhanced GUI visuals or animations.
-- Additional chess rules (3-fold repetition, 50-move rule, etc.).
-- Move ordering optimizations or transposition tables for the AI.
+1. Fork the repository and clone locally.
+2. Create a new branch for your feature or fix (e.g., `git checkout -b feature/polish-gui`).
+3. Commit and push your changes.
+4. Open a Pull Request, describing your changes thoroughly.
+
+### Potential areas to improve:
+- Advanced Evaluation (positional heuristics, king safety, etc.)
+- Move Ordering or Transposition Tables for faster AI.
+- Fancy GUI Animations or a nicer 2D/3D board design.
+- Additional Chess Rules like the 50-move rule or threefold repetition.
+
+---
 
 ## License
 
-This project is open-source under the [MIT License](LICENSE), which allows commercial and private use, modification, and distribution.
+Open-source under the MIT License. You’re free to modify and distribute, as long as the same license terms are maintained.
 
-### Happy Coding!
+---
 
-If you find any issues or have improvements, feel free to submit a pull request or open an issue. Thank you for checking out **Chess-engine**!
+## Acknowledgments
+
+- Pygame for enabling the GUI.
+- Python community for libraries and tutorials.
+- Everyone who contributed feedback, testing scenarios, and code improvements.
+
+---
+
+Happy coding!  
+If you find any issues or have suggestions, please open an issue or PR. Enjoy your game of Chess!
