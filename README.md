@@ -1,6 +1,6 @@
-# Chess Engine
+# CheckMate AI
 
-A **Python-based Chess Engine** offering both **command-line** and **graphical (Pygame)** interfaces. You can **drag and drop** pieces in the GUI, or take turns typing moves in the CLI. Supports **Human vs AI** (Minimax + Alpha-Beta) or **Two-human** mode. All standard chess rules are included—check, checkmate, castling, en passant, and promotions.
+A **Python-based CheckMate AI** offering both **command-line** and **graphical (Pygame)** interfaces. You can **drag and drop** pieces in the GUI, or take turns typing moves in the CLI. Supports **Human vs AI** (Minimax + Alpha-Beta) or **Two-human** mode. All standard  rules are included—check, checkmate, castling, en passant, and promotions.
 
 ---
 
@@ -8,7 +8,7 @@ A **Python-based Chess Engine** offering both **command-line** and **graphical (
 
 ### Multiple Modes
 - **CLI**: Command-line interface with text-based board display.  
-- **GUI**: Pygame-based board, similar to chess.com’s drag-and-drop style.  
+- **GUI**: Pygame-based board, similar to .com’s drag-and-drop style.  
 - **Human vs. AI** or **Two Humans** (in both CLI or GUI).
 
 ### Minimax AI (Alpha-Beta)
@@ -40,13 +40,13 @@ A **Python-based Chess Engine** offering both **command-line** and **graphical (
 
 Clone or download this repository and navigate into its folder:
 ```bash
-git clone https://github.com/your-username/chess_engine.git
-cd chess_engine
+git clone https://github.com/your-username/CheckMate-AI.git
+cd CheckMate-AI
 ```
 
 ### Directory Structure
 ```
-chess_engine/
+CheckMate-AI/
 ├── main.py            # Entry point for CLI or GUI
 ├── game_manager.py    # Handles game flow, turns, AI calls
 ├── gui.py             # Pygame interface (drag-and-drop, highlighting)
@@ -74,7 +74,7 @@ chess_engine/
 ```
 
 - **assets/**: Contains your piece images (one for each piece/color).
-- **pieces/**: Specialized classes for each chess piece type.
+- **pieces/**: Specialized classes for each  piece type.
 - **board.py**: The heart of the engine, sets up the board and enforces rules.
 - **game_manager.py**: Orchestrates game turns, interacts with players or AI.
 - **gui.py**: Implements the Pygame-based drag-and-drop interface.
@@ -84,7 +84,7 @@ chess_engine/
 
 ## Usage
 
-Open a terminal in the `chess_engine/` directory after installing dependencies.
+Open a terminal in the `CheckMate-AI/` directory after installing dependencies.
 
 ### 1. GUI Mode
 ```bash
@@ -190,4 +190,4 @@ Open-source under the MIT License. You’re free to modify and distribute, as lo
 ---
 
 Happy coding!  
-If you find any issues or have suggestions, please open an issue or PR. Enjoy your game of Chess!
+If you find any issues or have suggestions, please open an issue or PR. Enjoy your game of !
